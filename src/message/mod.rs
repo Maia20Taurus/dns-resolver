@@ -3,23 +3,55 @@ pub mod question;
 
 #[derive(Debug)]
 pub enum Qr {
-    Query = 0,
-    Response = 1
+    Query,
+    Response
+}
+
+impl Qr {
+    fn value(self) -> u16 {
+        match self {
+            Qr::Query => 0,
+            Qr::Response => 1
+        }
+    }
 }
 
 #[derive(Debug)]
 pub enum Opcode {
-    Query = 0,
-    IQuery = 1,
-    Status = 2
+    Query,
+    IQuery,
+    Status
+}
+
+impl Opcode {
+    fn value(self) -> u16 {
+        match self {
+            Opcode::Query => 0,
+            Opcode::IQuery => 1,
+            Opcode::Status => 2
+        }
+    }
 }
 
 #[derive(Debug)]
 pub enum ResponseCode {
-    NoError = 0,
-    FormatError = 1,
-    ServerFailure = 2,
-    NameError = 3,
-    NotImplemented = 4,
-    Refused = 5
+    NoError,
+    FormatError,
+    ServerFailure,
+    NameError,
+    NotImplemented,
+    Refused
+}
+
+impl ResponseCode {
+    fn value(self) -> u16 {
+        match self {
+            ResponseCode::NoError => 0,
+            ResponseCode::FormatError => 1,
+            ResponseCode::ServerFailure => 2,
+            ResponseCode::NameError => 3,
+            ResponseCode::NotImplemented => 4,
+            ResponseCode::Refused => 5
+        }
+    }
 }

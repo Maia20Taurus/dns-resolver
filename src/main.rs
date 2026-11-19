@@ -13,10 +13,11 @@ fn main() -> std::io::Result<()> {
         let filled_buf = &mut buf[..amt];
 
         let mut header = Header::from(filled_buf).unwrap();
+        header.set_response(true);
         println!("Header: {:?}", header);
 
         // send back to origin
-        socket.send_to(&[0; 512], &src)?;
+        socket.send_to(&header.in_bytes().unwrap(), &src)?;
 
         let mut qname_iter = filled_buf[12..].iter();
         let mut domain = String::new();
@@ -43,7 +44,7 @@ fn main() -> std::io::Result<()> {
         for i in 0..8 {
             let mask = 1 << i;
             let bit_is_set = (mask & x) > 0;
-            println!("bit number {i} is set: {bit_is_set}");
+            //println!("bit number {i} is set: {bit_is_set}");
         }
     } // the socket is closed here
     Ok(())
