@@ -1,4 +1,5 @@
 use dns_resolver::message::header::Header;
+use dns_resolver::message::question::Question;
 use dns_resolver::message::*;
 use std::net::UdpSocket;
 
@@ -13,31 +14,13 @@ fn main() -> std::io::Result<()> {
         let filled_buf = &mut buf[..amt];
 
         let mut header = Header::from(filled_buf).unwrap();
+        let question = Question::from(filled_buf);
         header.set_response(true);
         println!("Header: {:?}", header);
+        println!("Question: {:?}", question);
 
         // send back to origin
         socket.send_to(&header.in_bytes().unwrap(), &src)?;
-
-        let mut qname_iter = filled_buf[12..].iter();
-        let mut domain = String::new();
-
-        loop {
-            let label_length = *qname_iter.next().expect("No length found.");
-
-            if label_length == 0 {
-                break;
-            }
-
-            for _ in 0..label_length {
-                let parsed = [*qname_iter.next().expect("Couldn't parse octet")];
-                let letter = std::str::from_utf8(&parsed).expect("Couldn't parse letter");
-                domain.push_str(letter);
-            }
-            domain.push_str(".");
-        }
-
-        println!("Parsed domain: {}", domain);
 
         let x = filled_buf[3];
         // check all the bits from LSB to MSB
