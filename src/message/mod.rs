@@ -8,7 +8,7 @@ pub enum Qr {
 }
 
 impl Qr {
-    fn value(self) -> u16 {
+    fn value(&self) -> u16 {
         match self {
             Qr::Query => 0,
             Qr::Response => 1
@@ -24,7 +24,7 @@ pub enum Opcode {
 }
 
 impl Opcode {
-    fn value(self) -> u16 {
+    fn value(&self) -> u16 {
         match self {
             Opcode::Query => 0,
             Opcode::IQuery => 1,
@@ -44,7 +44,7 @@ pub enum ResponseCode {
 }
 
 impl ResponseCode {
-    fn value(self) -> u16 {
+    fn value(&self) -> u16 {
         match self {
             ResponseCode::NoError => 0,
             ResponseCode::FormatError => 1,

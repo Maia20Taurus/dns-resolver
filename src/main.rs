@@ -1,6 +1,6 @@
-use std::net::UdpSocket;
 use dns_resolver::message::header::Header;
 use dns_resolver::message::*;
+use std::net::UdpSocket;
 
 fn main() -> std::io::Result<()> {
     {

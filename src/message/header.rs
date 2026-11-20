@@ -64,21 +64,22 @@ impl Header {
         Ok(header)
     }
 
-    pub fn in_bytes(self) -> Result<[u8; 12], String> {
+    pub fn in_bytes(&self) -> Result<[u8; 12], String> {
         let id_bytes = self.id.to_be_bytes();
         let qdcount_bytes = self.qdcount.to_be_bytes();
         let ancount_bytes = self.ancount.to_be_bytes();
         let nscount_bytes = self.nscount.to_be_bytes();
         let arcount_bytes = self.arcount.to_be_bytes();
 
-        let bytes = (self.rcode.value() 
-        + self.z << 4 
-        + (if self.ra { 1 } else { 0 }) << 7 
-        + (if self.rd { 1 } else { 0 }) << 8
-        + (if self.tc {1} else {0}) << 9
-        + (if self.aa {1} else {0}) << 10
-        + self.opcode.value() << 11
-        + self.qr.value() << 15).to_be_bytes();
+        let bytes = (self.rcode.value() + self.z
+            << 4 + (if self.ra { 1 } else { 0 })
+            << 7 + (if self.rd { 1 } else { 0 })
+            << 8 + (if self.tc { 1 } else { 0 })
+            << 9 + (if self.aa { 1 } else { 0 })
+            << 10 + self.opcode.value()
+            << 11 + self.qr.value()
+            << 15)
+            .to_be_bytes();
 
         let stream = [
             id_bytes[0],
