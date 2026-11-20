@@ -1,4 +1,33 @@
-use crate::{ClassType, RecordType};
+use crate::RecordType;
+
+#[repr(u16)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ClassType {
+    IN = 1,
+    CS = 2,
+    CH = 3,
+    HS = 4
+}
+
+impl TryFrom<u16> for ClassType {
+    type Error = &'static str;
+
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            1 => Ok(ClassType::IN),
+            2 => Ok(ClassType::CS),
+            3 => Ok(ClassType::CH),
+            4 => Ok(ClassType::HS),
+            _ => Err("Unknown DNS class type")
+        }
+    }
+}
+
+impl From<ClassType> for u16 {
+    fn from(class: ClassType) -> Self {
+        class as u16
+    }
+}
 
 #[derive(Debug)]
 pub struct Question {
