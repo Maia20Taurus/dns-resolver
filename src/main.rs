@@ -14,13 +14,20 @@ fn main() -> std::io::Result<()> {
         let filled_buf = &mut buf[..amt];
 
         let mut header = Header::from(filled_buf).unwrap();
-        let question = Question::from(filled_buf);
+        let (question, after_question) = Question::from(filled_buf).unwrap();
         header.set_response(true);
         println!("Header: {:?}", header);
         println!("Question: {:?}", question);
 
+        let mut response: Vec<u8> = Vec::new();
+        let header_bytes = header.to_be_bytes();
+        let question_bytes = question.to_be_bytes();
+
+        response.extend_from_slice(&header_bytes);
+        response.extend_from_slice(&question_bytes);
+
         // send back to origin
-        socket.send_to(&header.in_bytes().unwrap(), &src)?;
+        socket.send_to(&response, &src)?;
 
         let x = filled_buf[3];
         // check all the bits from LSB to MSB

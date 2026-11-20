@@ -6,7 +6,7 @@ pub enum ClassType {
     IN = 1,
     CS = 2,
     CH = 3,
-    HS = 4
+    HS = 4,
 }
 
 impl TryFrom<u16> for ClassType {
@@ -18,7 +18,7 @@ impl TryFrom<u16> for ClassType {
             2 => Ok(ClassType::CS),
             3 => Ok(ClassType::CH),
             4 => Ok(ClassType::HS),
-            _ => Err("Unknown DNS class type")
+            _ => Err("Unknown DNS class type"),
         }
     }
 }
@@ -64,6 +64,7 @@ impl Question {
                 let parsed = [*qname_iter.next().expect("Couldn't parse octet")];
                 let letter = std::str::from_utf8(&parsed).expect("Couldn't parse letter");
                 domain.push_str(letter);
+
                 domain_length_octets += 1;
             }
             domain.push_str(".");
@@ -84,5 +85,29 @@ impl Question {
             },
             &after_domain[4..],
         ))
+    }
+
+    /// Construct bytes from a Question
+    pub fn to_be_bytes(&self) -> Vec<u8> {
+        let mut bytes: Vec<u8> = Vec::new();
+
+        let mut label: Vec<u8> = Vec::new();
+        for b in self.qname.chars() {
+            match b {
+                '.' => {
+                    bytes.push(label.len() as u8);
+                    bytes.append(&mut label)
+                }
+                _ => label.push(b as u8),
+            }
+        }
+
+        let qtype_bytes = u16::from(self.qtype).to_be_bytes();
+        let qclass_bytes = u16::from(self.qclass).to_be_bytes();
+
+        bytes.extend(qtype_bytes);
+        bytes.extend(qclass_bytes);
+
+        bytes
     }
 }
