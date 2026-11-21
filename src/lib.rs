@@ -59,15 +59,15 @@ impl DomainName {
         // Track the length of the domain
         let mut domain_length_octets = 0;
         loop {
-            let label_length = *stream_iter.next().expect("No length found.");
+            let label_length = *stream_iter.next().ok_or("No length found.")?;
 
             if label_length == 0 {
                 break;
             }
 
             for _ in 0..label_length {
-                let parsed = [*stream_iter.next().expect("Couldn't parse octet")];
-                let letter = std::str::from_utf8(&parsed).expect("Couldn't parse letter");
+                let parsed = [*stream_iter.next().ok_or("Couldn't parse octet")?];
+                let letter = std::str::from_utf8(&parsed).map_err(|_| "Couldn't parse letter")?;
                 domain.push_str(letter);
 
                 domain_length_octets += 1;
