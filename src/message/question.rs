@@ -48,38 +48,14 @@ impl Question {
     /// after the question
     pub fn from(stream: &[u8]) -> Result<(Question, &[u8]), String> {
         let question_onwards = &stream[12..];
-        let mut qname_iter = question_onwards.iter();
-        let mut domain = String::new();
-
-        // Track the length of the domain
-        let mut domain_length_octets = 0;
-        loop {
-            let label_length = *qname_iter.next().expect("No length found.");
-
-            if label_length == 0 {
-                break;
-            }
-
-            for _ in 0..label_length {
-                let parsed = [*qname_iter.next().expect("Couldn't parse octet")];
-                let letter = std::str::from_utf8(&parsed).expect("Couldn't parse letter");
-                domain.push_str(letter);
-
-                domain_length_octets += 1;
-            }
-            domain.push_str(".");
-            domain_length_octets += 1;
-        }
-        // By this point we should have the domain
-
-        let after_domain = &question_onwards[domain_length_octets + 1..];
+        let (domain, after_domain) = crate::DomainName::from(question_onwards)?;
 
         let qtype = RecordType::try_from(u16::from_be_bytes([after_domain[0], after_domain[1]]))?;
         let qclass = ClassType::try_from(u16::from_be_bytes([after_domain[2], after_domain[3]]))?;
 
         Ok((
             Question {
-                qname: domain,
+                qname: domain.domain,
                 qtype,
                 qclass,
             },
