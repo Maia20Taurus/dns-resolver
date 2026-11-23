@@ -55,7 +55,7 @@ impl CharacterString {
     pub fn from(stream: &[u8]) -> Result<(Self, &[u8]), String> {
         let mut stream_iter = stream.iter();
         let length = *stream_iter.next().ok_or("Couldn't parse CharacterString length")? as usize;
-        let character_string: String = stream.iter().take(length).map(|b| *b as char).collect();
+        let character_string: String = stream_iter.take(length).map(|b| *b as char).collect();
         Ok((
             Self {
                 characters: character_string,
@@ -64,6 +64,20 @@ impl CharacterString {
         ))
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_characterstring_from_correctness() {
+        let mut stream = vec![7];
+        stream.extend_from_slice("example".as_bytes());
+        let (character_string, _) = CharacterString::from(&stream).unwrap();
+        assert_eq!("example".to_string(), character_string.characters);
+    }
+}
+
 
 pub struct DomainName {
     domain: String,
