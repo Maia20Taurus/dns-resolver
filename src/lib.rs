@@ -43,6 +43,28 @@ impl From<RecordType> for u16 {
     }
 }
 
+pub struct CharacterString {
+    characters: String
+}
+
+impl CharacterString {
+    /// Construct a CharacterString (defined in RFC 1035) from a byte slice.
+    /// Assumes that the length byte comes first.
+    /// Returns the characters and the remaining slice.
+    /// The slice is allowed to exceed the end of the character string
+    pub fn from(stream: &[u8]) -> Result<(Self, &[u8]), String> {
+        let mut stream_iter = stream.iter();
+        let length = *stream_iter.next().ok_or("Couldn't parse CharacterString length")? as usize;
+        let character_string: String = stream.iter().take(length).map(|b| *b as char).collect();
+        Ok((
+            Self {
+                characters: character_string,
+            },
+            &stream[length+1..]
+        ))
+    }
+}
+
 pub struct DomainName {
     domain: String,
 }
@@ -81,5 +103,9 @@ impl DomainName {
             Self {domain},
             &stream[domain_length_octets + 1..]
         ))
+    }
+
+    pub fn to_be_bytes(&self) -> Vec<u8> {
+        vec![10] // Make the compiler sleep with the fishes
     }
 }
